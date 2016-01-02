@@ -24,7 +24,7 @@ end
 -- determine whether this is a leap year
 downewyear  = 0 + os.date('%w',os.time({year=year, month=1, day=1}))
 dowmarch1st = 0 + os.date('%w',os.time({year=year, month=3, day=1}))
-dowdiff = math.mod(7 + dowmarch1st - downewyear, 7)
+dowdiff = math.fmod(7 + dowmarch1st - downewyear, 7)
 
 if (3 == dowdiff) then
     dayoffset = nydayoffset
@@ -46,7 +46,7 @@ else
 end
 
 -- on years ending with sunday the left dark vertical line ends at the bottom
-if 1 == math.mod(downewyear + dayoffset[13],7) then
+if 1 == math.fmod(downewyear + dayoffset[13],7) then
     rightvertical = '\\psline(7,53)(7,0)'
 else
     rightvertical = '\\psline(7,' .. weeks .. ')(7,1)'
@@ -55,7 +55,7 @@ end
 -- this function creates the dark lines between two months
 function horizontal_line(monthno, weeks, downewyear, dayoffset)
     local ul = weeks - math.ceil(dayoffset[monthno]/7)
-    local fd = math.mod(dayoffset[monthno] + downewyear,7)
+    local fd = math.fmod(dayoffset[monthno] + downewyear,7)
     if 0 == fd then
         fd = 7
     end
