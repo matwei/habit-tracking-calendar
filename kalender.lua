@@ -11,6 +11,7 @@
 -- day offset of first per month in normal year and leap year
 nydayoffset = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 }
 lydayoffset = { 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366 }
+months      = { 'J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D' }
 
 weeks       = 53
 
@@ -65,27 +66,21 @@ function horizontal_line(monthno, weeks, downewyear, dayoffset)
     if 1 == fd then
         return '\\psline(0,' .. ul .. ')(7,' .. ul .. ')'
     end
-    return '\\psline(0,'
-        .. ul - 1
-        ..')('
-        .. fd - 1
-        .. ','
-        .. ul - 1
-        .. ') \\psline('
-        .. fd - 1
-        .. ','
-        .. ul - 1
-        .. ')('
-        .. fd - 1
-        .. ','
-        .. ul
-        .. ') \\psline('
-        .. fd - 1
-        .. ','
-        .. ul
-        .. ')(7,'
-        .. ul
-        .. ')'
+    return '\\psline(0,' .. ul - 1 ..')(' .. fd - 1 .. ',' .. ul - 1
+        .. ') \\psline(' .. fd - 1 .. ',' .. ul - 1 .. ')(' .. fd - 1 .. ',' .. ul
+        .. ') \\psline(' .. fd - 1 .. ',' .. ul .. ')(7,' .. ul .. ')'
+end
+
+-- this function places the months initials
+function month_line(monthno, weeks, downewyear, dayoffset)
+    line = weeks - math.ceil(dayoffset[monthno] / 7) - 2
+    dow = dayoffset[monthno] % 7
+    if (0 == downewyear) then
+        line = line - 1
+    elseif (0 == dow) then
+        line = line - 1
+    end
+    return '\\rput(0,' .. line .. '.5){' .. months[monthno] .. '}'
 end
 
 -- this latextemplate contains the parts which are identical for each calendar
@@ -101,21 +96,35 @@ latextemplate = [[
 \begin{document}
  \begin{figure}
   \begin{pspicture}(30,1)
-   \rput(2,3){\huge \CALyear}
-   \psline(9,2)(34,2)
+   \rput(3,3){\huge \CALyear}
+   \psline(10,2)(34,2)
   \end{pspicture}
   \\
-\begin{pspicture}(7,1)%
-\rput(0.5,1){M}
-\rput(1.5,1){D}
-\rput(2.5,1){M}
-\rput(3.5,1){D}
-\rput(4.5,1){F}
-\rput(5.5,1){S}
-\rput(6.5,1){S}
-\end{pspicture}%
-\\
-\begin{pspicture}(7,\CALweeks)%
+  \begin{pspicture}(8,1)%
+   \rput(1.5,1){M}
+   \rput(2.5,1){D}
+   \rput(3.5,1){M}
+   \rput(4.5,1){D}
+   \rput(5.5,1){F}
+   \rput(6.5,1){S}
+   \rput(7.5,1){S}
+  \end{pspicture}%
+  \\
+  \begin{pspicture}(1,\CALweeks)%
+   \CALmonth1
+   \CALmonth2
+   \CALmonth3
+   \CALmonth4
+   \CALmonth5
+   \CALmonth6
+   \CALmonth7
+   \CALmonth8
+   \CALmonth9
+   \CALmonth10
+   \CALmonth11
+   \CALmonth12
+  \end{pspicture}%
+  \begin{pspicture}(7,\CALweeks)%
    \psgrid[subgriddiv=1](7,\CALweeks)
    \CALleftvertical
    \CALrightvertical
@@ -132,16 +141,16 @@ latextemplate = [[
    \CALhorizontalline11
    \CALhorizontalline12
    \CALhorizontalline13
-\end{pspicture}%
-\begin{pspicture}(2,\CALweeks)
-\end{pspicture}%
-\begin{pspicture}(25,\CALweeks)
+  \end{pspicture}%
+  \begin{pspicture}(2,\CALweeks)
+  \end{pspicture}%
+  \begin{pspicture}(25,\CALweeks)
    \psset{linecolor=lightgray}
    \multido{\iy=0+1}{\CALweeks}{%
-   \psline(0,\iy)(25,\iy)%
+   \psline(0,\iy)(24,\iy)%
    }
-\end{pspicture}
-\end{figure}
+  \end{pspicture}
+ \end{figure}
 \end{document}
 ]]
 
@@ -154,6 +163,11 @@ for hl = 13, 1, -1 do
     latextemplate = string.gsub(latextemplate
                                ,'\\CALhorizontalline' .. hl
                                , horizontal_line(hl,weeks,downewyear,dayoffset))
+end
+for m = 12, 1, -1 do
+    latextemplate = string.gsub(latextemplate
+                               ,'\\CALmonth' .. m
+                               , month_line(m,weeks,downewyear,dayoffset))
 end
 
 -- now print that calendar
