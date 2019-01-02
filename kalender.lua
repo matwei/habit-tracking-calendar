@@ -86,7 +86,7 @@ end
 -- this latextemplate contains the parts which are identical for each calendar
 latextemplate = [[
 %% calendar-\CALyear.tex - generated with kalender.lua
-\documentclass{article}
+\documentclass[a4paper]{article}
 \usepackage{pstricks}
 \usepackage{multido}
 \psset{unit=.40cm}
